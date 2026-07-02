@@ -9,6 +9,7 @@ import { createParser } from "../parser/index.js";
 import { createMcpGenerator } from "../generators/index.js";
 import { createProjectBuilder } from "../builder/index.js";
 import { createPackager } from "../packager/index.js";
+import { ERROR_CODES, error } from "../utils/warning-codes.js";
 
 export interface PipelineOrchestrator {
   run(input: InputSource, options?: { projectName?: string; outputPath?: string }): Promise<Result<Archive>>;
@@ -120,6 +121,13 @@ export function createOrchestrator(
         logger.info(`Done (${snapshot.durationMs}ms)`);
 
         return success(packageResult.data, merged.warnings, snapshot);
+      } catch (e) {
+        return failure([
+          error(
+            ERROR_CODES.E003,
+            e instanceof Error ? e.message : String(e),
+          ),
+        ]);
       } finally {
         if (workspacePath) {
           await rm(workspacePath, { recursive: true, force: true }).catch(() => {});

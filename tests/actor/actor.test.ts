@@ -5,7 +5,9 @@ const mockSetValue = vi.fn();
 const mockGetInput = vi.fn();
 const mockGetPublicUrl = vi.fn();
 const mockOpenKeyValueStore = vi.fn();
+const mockSetStatusMessage = vi.fn();
 const mockRun = vi.fn();
+const mockLogError = vi.fn();
 
 vi.mock("apify", () => ({
   Actor: {
@@ -13,6 +15,10 @@ vi.mock("apify", () => ({
     pushData: (...args: unknown[]) => mockPushData(...args),
     setValue: (...args: unknown[]) => mockSetValue(...args),
     openKeyValueStore: (...args: unknown[]) => mockOpenKeyValueStore(...args),
+    setStatusMessage: (...args: unknown[]) => mockSetStatusMessage(...args),
+  },
+  log: {
+    error: (...args: unknown[]) => mockLogError(...args),
   },
 }));
 
@@ -20,7 +26,40 @@ vi.mock("../../src/orchestrator/index.js", () => ({
   createOrchestrator: () => ({ run: mockRun }),
 }));
 
-const { runActor } = await import("../../src/actor/handler.js");
+const { runActor, normalizeActorInput } = await import("../../src/actor/handler.js");
+
+describe("normalizeActorInput", () => {
+  it("rejects whitespace-only openApiSpec", () => {
+    const result = normalizeActorInput({ openApiSpec: "   ", format: "yaml" });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors[0]?.code).toBe("E001");
+      expect(result.errors[0]?.message).toBe("openApiSpec must not be empty");
+    }
+  });
+
+  it("rejects invalid format", () => {
+    const result = normalizeActorInput({
+      openApiSpec: "openapi: 3.0.0",
+      format: "xml" as "json",
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors[0]?.message).toBe('format must be "json" or "yaml"');
+    }
+  });
+
+  it("trims openApiSpec on success", () => {
+    const result = normalizeActorInput({
+      openApiSpec: "  openapi: 3.0.0\n",
+      format: "yaml",
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.input.openApiSpec).toBe("openapi: 3.0.0");
+    }
+  });
+});
 
 describe("Actor handler", () => {
   beforeEach(() => {
@@ -29,7 +68,11 @@ describe("Actor handler", () => {
     mockGetInput.mockClear();
     mockGetPublicUrl.mockClear();
     mockOpenKeyValueStore.mockClear();
+    mockSetStatusMessage.mockClear();
     mockRun.mockClear();
+    mockLogError.mockClear();
+    mockPushData.mockResolvedValue(undefined);
+    mockSetStatusMessage.mockResolvedValue(undefined);
     mockOpenKeyValueStore.mockResolvedValue({
       getPublicUrl: mockGetPublicUrl,
     });
@@ -55,6 +98,53 @@ describe("Actor handler", () => {
     expect(mockRun).not.toHaveBeenCalled();
   });
 
+  it("maps null input to validation error output", async () => {
+    mockGetInput.mockResolvedValue(null);
+
+    await runActor();
+
+    expect(mockPushData).toHaveBeenCalledWith({
+      success: false,
+      errors: [
+        {
+          code: "E001",
+          message: "openApiSpec and format are required",
+        },
+      ],
+      warnings: [],
+    });
+    expect(mockRun).not.toHaveBeenCalled();
+  });
+
+  it("rejects whitespace-only openApiSpec without calling orchestrator", async () => {
+    mockGetInput.mockResolvedValue({ openApiSpec: "   ", format: "yaml" });
+
+    await runActor();
+
+    expect(mockRun).not.toHaveBeenCalled();
+    expect(mockPushData).toHaveBeenCalledWith({
+      success: false,
+      errors: [{ code: "E001", message: "openApiSpec must not be empty" }],
+      warnings: [],
+    });
+  });
+
+  it("rejects invalid format without calling orchestrator", async () => {
+    mockGetInput.mockResolvedValue({
+      openApiSpec: "openapi: 3.0.0",
+      format: "xml",
+    });
+
+    await runActor();
+
+    expect(mockRun).not.toHaveBeenCalled();
+    expect(mockPushData).toHaveBeenCalledWith({
+      success: false,
+      errors: [{ code: "E001", message: 'format must be "json" or "yaml"' }],
+      warnings: [],
+    });
+  });
+
   it("maps orchestrator failure to error output", async () => {
     mockGetInput.mockResolvedValue({
       openApiSpec: "{ invalid json",
@@ -76,6 +166,31 @@ describe("Actor handler", () => {
       warnings: [],
     });
     expect(mockSetValue).not.toHaveBeenCalled();
+  });
+
+  it("maps orchestrator throw to error output without rethrowing", async () => {
+    mockGetInput.mockResolvedValue({
+      openApiSpec: "openapi: 3.0.0",
+      format: "yaml",
+    });
+    mockRun.mockRejectedValue(new Error("unexpected pipeline failure"));
+
+    await expect(runActor()).resolves.toBeUndefined();
+
+    expect(mockPushData).toHaveBeenCalledWith({
+      success: false,
+      errors: [{ code: "E003", message: "unexpected pipeline failure" }],
+      warnings: [],
+    });
+  });
+
+  it("completes without throwing when pushData fails on failure path", async () => {
+    mockGetInput.mockResolvedValue({});
+    mockPushData.mockRejectedValue(new Error("dataset unavailable"));
+
+    await expect(runActor()).resolves.toBeUndefined();
+
+    expect(mockLogError).toHaveBeenCalled();
   });
 
   it("maps successful generation to output with downloadUrl", async () => {
