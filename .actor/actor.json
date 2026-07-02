@@ -1,0 +1,9 @@
+{
+  "actorSpecification": 1,
+  "name": "openapi-to-mcp-server-generator",
+  "title": "OpenAPI to MCP Server Generator",
+  "description": "Generate a deployable MCP server ZIP from any OpenAPI 3.x spec — tools, auth, Dockerfile, and README included.",
+  "version": "1.0",
+  "input": "./input_schema.json",
+  "dockerfile": "./Dockerfile"
+}

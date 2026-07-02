@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Generation golden tests > generates deterministic file tree from petstore > petstore-file-paths 1`] = `
+[
+  ".env.example",
+  "Dockerfile",
+  "README.md",
+  "package.json",
+  "src/auth/auth.ts",
+  "src/client.ts",
+  "src/config.ts",
+  "src/index.ts",
+  "src/tools/add_pet.ts",
+  "src/tools/delete_pet.ts",
+  "src/tools/find_pets_by_status.ts",
+  "src/tools/get_pet_by_id.ts",
+  "src/tools/types.ts",
+  "src/tools/update_pet.ts",
+  "tsconfig.json",
+]
+`;

@@ -1,0 +1,35 @@
+{{#each authSchemes}}
+// {{id}}: {{type}} via {{location}} ({{parameterName}})
+{{/each}}
+
+import type { InternalAxiosRequestConfig } from "axios";
+
+function getEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
+}
+
+export function applyAuthentication(config: InternalAxiosRequestConfig): void {
+  if (!config.headers) {
+    config.headers = {} as InternalAxiosRequestConfig["headers"];
+  }
+{{#each authSchemes}}
+  {{#if (eq type "bearer")}}
+  const {{envVariable}} = getEnv("{{envVariable}}");
+  config.headers["Authorization"] = `Bearer ${ {{envVariable}} }`;
+  {{else}}
+  {{#if (eq location "header")}}
+  config.headers["{{parameterName}}"] = getEnv("{{envVariable}}");
+  {{/if}}
+  {{#if (eq location "query")}}
+  config.params = { ...config.params, {{parameterName}}: getEnv("{{envVariable}}") };
+  {{/if}}
+  {{#if (eq location "cookie")}}
+  config.headers["Cookie"] = `${config.headers["Cookie"] ?? ""}; {{parameterName}}=${getEnv("{{envVariable}}")}`;
+  {{/if}}
+  {{/if}}
+{{/each}}
+}

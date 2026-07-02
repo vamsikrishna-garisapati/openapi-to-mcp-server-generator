@@ -1,0 +1,55 @@
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
+{{#each tools}}
+import {
+  {{id}}ToolDefinition,
+  handle{{pascalId}},
+} from "./tools/{{id}}.js";
+{{/each}}
+
+const server = new Server(
+  { name: "{{projectSlug}}", version: "{{version}}" },
+  { capabilities: { tools: {} } },
+);
+
+const toolHandlers: Record<
+  string,
+  (args: Record<string, unknown>) => ReturnType<typeof handle{{firstToolPascalId}}>
+> = {
+{{#each tools}}
+  "{{name}}": handle{{pascalId}},
+{{/each}}
+};
+
+server.setRequestHandler(ListToolsRequestSchema, async () => ({
+  tools: [
+{{#each tools}}
+    {{id}}ToolDefinition,
+{{/each}}
+  ],
+}));
+
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  const handler = toolHandlers[request.params.name];
+  if (!handler) {
+    return {
+      content: [{ type: "text", text: `Unknown tool: ${request.params.name}` }],
+      isError: true,
+    };
+  }
+  return handler((request.params.arguments ?? {}) as Record<string, unknown>);
+});
+
+async function main(): Promise<void> {
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+}
+
+main().catch((error) => {
+  console.error("Server error:", error instanceof Error ? error.message : error);
+  process.exit(1);
+});

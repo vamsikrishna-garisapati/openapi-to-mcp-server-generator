@@ -1,0 +1,56 @@
+# {{title}}
+
+{{description}}
+
+## Installation
+
+```bash
+pnpm install
+pnpm run build
+```
+
+## Configuration
+
+Copy the environment template and fill in required values:
+
+```bash
+cp .env.example .env
+```
+
+## Environment Variables
+
+{{#each envVariables}}
+- `{{name}}` — {{description}}
+{{/each}}
+
+## Running the Server
+
+```bash
+pnpm start
+```
+
+The server uses stdio transport for MCP clients.
+
+## Docker
+
+```bash
+docker build -t {{projectSlug}} .
+docker run --env-file .env {{projectSlug}}
+```
+
+## Example Usage
+
+Connect this MCP server to a compatible client (e.g. Cursor, Claude Desktop) via stdio.
+
+Available tools:
+
+{{#each tools}}
+- `{{name}}` — {{description}}
+{{/each}}
+
+## Troubleshooting
+
+- Ensure all required environment variables are set.
+- Verify `BASE_URL` points to a reachable API when required.
+- Check API credentials match the authentication scheme in the OpenAPI spec.
+- Run `pnpm run build` to verify TypeScript compilation before starting.

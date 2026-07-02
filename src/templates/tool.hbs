@@ -1,0 +1,64 @@
+import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { client } from "../client.js";
+
+export const {{id}}ToolDefinition = {
+  name: "{{name}}",
+  description: `{{description}}`,
+  inputSchema: {{{inputSchemaJson}}} as const,
+};
+
+export async function handle{{pascalId}}(
+  args: Record<string, unknown>,
+): Promise<{ content: Array<{ type: "text"; text: string }>; isError?: boolean }> {
+  try {
+    let path = `{{path}}`{{#each pathParams}}.replace("{{{this}}}", String(args["{{{this}}}"])){{/each}};
+    const response = await client.request({
+      method: "{{method}}",
+      url: path,
+      {{#if queryParams.length}}
+      params: {
+        {{#each queryParams}}
+        "{{{this}}}": args["{{{this}}}"],
+        {{/each}}
+      },
+      {{/if}}
+      {{#if headerParams.length}}
+      headers: {
+        {{#each headerParams}}
+        "{{{this}}}": String(args["{{{this}}}"]),
+        {{/each}}
+      },
+      {{/if}}
+      {{#if hasRequestBody}}
+      {{#if bodyFields.length}}
+      data: {
+        {{#each bodyFields}}
+        "{{{this}}}": args["{{{this}}}"],
+        {{/each}}
+      },
+      {{else}}
+      data: args["body"],
+      {{/if}}
+      {{/if}}
+    });
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify(response.data, null, 2),
+        },
+      ],
+    };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
+    return {
+      content: [{ type: "text" as const, text: `Error: ${message}` }],
+      isError: true,
+    };
+  }
+}
+
+export function register{{pascalId}}(server: Server): void {
+  // Registration handled centrally in index.ts
+}

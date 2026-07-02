@@ -1,0 +1,56 @@
+openapi: 3.0.3
+info:
+  title: API Key Auth API
+  version: 1.0.0
+servers:
+  - url: https://api.example.com/v1
+components:
+  securitySchemes:
+    ApiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    ApiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+security:
+  - ApiKeyHeader: []
+paths:
+  /items:
+    get:
+      operationId: listItems
+      summary: List items
+      security:
+        - ApiKeyQuery: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /items/{id}:
+    get:
+      operationId: getItem
+      summary: Get item by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string

@@ -1,0 +1,27 @@
+{
+  "title": "OpenAPI to MCP Server Generator Input",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "openApiSpec": {
+      "title": "OpenAPI Specification",
+      "type": "string",
+      "description": "Full OpenAPI specification as JSON or YAML string",
+      "editor": "textarea"
+    },
+    "format": {
+      "title": "Format",
+      "type": "string",
+      "enum": ["json", "yaml"],
+      "description": "Specification format",
+      "editor": "select"
+    },
+    "projectName": {
+      "title": "Project Name",
+      "type": "string",
+      "description": "Optional override for generated project name",
+      "editor": "textfield"
+    }
+  },
+  "required": ["openApiSpec", "format"]
+}

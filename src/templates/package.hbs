@@ -1,0 +1,25 @@
+{
+  "name": "{{projectSlug}}",
+  "version": "1.0.0",
+  "description": "{{description}}",
+  "type": "module",
+  "packageManager": "pnpm@9.15.9",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "engines": {
+    "node": ">={{nodeVersion}}"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "{{mcpSdkVersion}}",
+    "axios": "{{axiosVersion}}"
+  },
+  "devDependencies": {
+    "@types/node": "{{typesNodeVersion}}",
+    "prettier": "{{prettierVersion}}",
+    "typescript": "{{typescriptVersion}}"
+  }
+}
