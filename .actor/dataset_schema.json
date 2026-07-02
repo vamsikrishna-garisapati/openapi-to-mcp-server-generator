@@ -1,0 +1,151 @@
+{
+  "actorSpecification": 1,
+  "fields": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "success": {
+        "type": "boolean",
+        "title": "Success",
+        "description": "Whether MCP server generation completed successfully.",
+        "example": true
+      },
+      "downloadUrl": {
+        "type": "string",
+        "title": "Download URL",
+        "description": "URL to download the generated mcp-server.zip from the key-value store. Present on successful runs.",
+        "example": "https://api.apify.com/v2/key-value-stores/abc123/records/mcp-server.zip"
+      },
+      "statistics": {
+        "type": "object",
+        "title": "Statistics",
+        "description": "Timing and generation metrics from the pipeline.",
+        "properties": {
+          "endpointCount": {
+            "type": "integer",
+            "title": "Endpoints",
+            "description": "Number of OpenAPI endpoints parsed.",
+            "example": 5
+          },
+          "toolCount": {
+            "type": "integer",
+            "title": "Tools",
+            "description": "Number of MCP tools generated.",
+            "example": 5
+          },
+          "fileCount": {
+            "type": "integer",
+            "title": "Files",
+            "description": "Number of files written to the generated project.",
+            "example": 15
+          },
+          "warningCount": {
+            "type": "integer",
+            "title": "Warnings",
+            "description": "Number of non-fatal generation warnings.",
+            "example": 0
+          },
+          "durationMs": {
+            "type": "integer",
+            "title": "Duration (ms)",
+            "description": "Total pipeline duration in milliseconds.",
+            "example": 186
+          }
+        }
+      },
+      "warnings": {
+        "type": "array",
+        "title": "Warnings",
+        "description": "Non-fatal issues encountered during generation.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "code": { "type": "string", "title": "Code", "example": "P004" },
+            "message": { "type": "string", "title": "Message" },
+            "location": { "type": "string", "title": "Location" }
+          },
+          "required": ["code", "message"]
+        }
+      },
+      "errors": {
+        "type": "array",
+        "title": "Errors",
+        "description": "Fatal errors that prevented generation.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "code": { "type": "string", "title": "Code", "example": "E001" },
+            "message": { "type": "string", "title": "Message" },
+            "location": { "type": "string", "title": "Location" }
+          },
+          "required": ["code", "message"]
+        }
+      }
+    },
+    "required": ["success"]
+  },
+  "views": {
+    "summary": {
+      "title": "Run summary",
+      "description": "Generation outcome, download link, and key metrics.",
+      "transformation": {
+        "flatten": ["statistics"],
+        "fields": [
+          "success",
+          "downloadUrl",
+          "statistics.endpointCount",
+          "statistics.toolCount",
+          "statistics.fileCount",
+          "statistics.warningCount",
+          "statistics.durationMs"
+        ]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "success": { "label": "Success", "format": "boolean" },
+          "downloadUrl": { "label": "ZIP download", "format": "link" },
+          "statistics.endpointCount": { "label": "Endpoints", "format": "number" },
+          "statistics.toolCount": { "label": "Tools", "format": "number" },
+          "statistics.fileCount": { "label": "Files", "format": "number" },
+          "statistics.warningCount": { "label": "Warnings", "format": "number" },
+          "statistics.durationMs": { "label": "Duration (ms)", "format": "number" }
+        }
+      }
+    },
+    "warnings": {
+      "title": "Warnings",
+      "description": "Non-fatal generation warnings with codes and locations.",
+      "transformation": {
+        "unwind": ["warnings"],
+        "fields": ["success", "warnings.code", "warnings.message", "warnings.location"]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "success": { "label": "Run succeeded", "format": "boolean" },
+          "warnings.code": { "label": "Code", "format": "text" },
+          "warnings.message": { "label": "Message", "format": "text" },
+          "warnings.location": { "label": "Location", "format": "text" }
+        }
+      }
+    },
+    "errors": {
+      "title": "Errors",
+      "description": "Fatal errors that stopped generation.",
+      "transformation": {
+        "unwind": ["errors"],
+        "fields": ["success", "errors.code", "errors.message", "errors.location"]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "success": { "label": "Run succeeded", "format": "boolean" },
+          "errors.code": { "label": "Code", "format": "text" },
+          "errors.message": { "label": "Message", "format": "text" },
+          "errors.location": { "label": "Location", "format": "text" }
+        }
+      }
+    }
+  }
+}

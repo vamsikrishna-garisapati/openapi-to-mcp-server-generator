@@ -5,5 +5,10 @@
   "description": "Generate a deployable MCP server ZIP from any OpenAPI 3.x spec — tools, auth, Dockerfile, and README included.",
   "version": "1.0",
   "input": "./input_schema.json",
-  "dockerfile": "./Dockerfile"
+  "output": "./output_schema.json",
+  "storages": {
+    "dataset": "./dataset_schema.json",
+    "keyValueStore": "./key_value_store_schema.json"
+  },
+  "dockerfile": "../Dockerfile"
 }

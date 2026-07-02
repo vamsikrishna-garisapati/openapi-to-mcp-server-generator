@@ -1,0 +1,13 @@
+{
+  "actorKeyValueStoreSchemaVersion": 1,
+  "title": "Generated MCP server artifacts",
+  "description": "Downloadable ZIP archives produced by the OpenAPI to MCP Server Generator.",
+  "collections": {
+    "mcpServerZip": {
+      "title": "MCP server ZIP",
+      "description": "Complete deployable MCP server project archive (TypeScript source, Dockerfile, README, and tool definitions).",
+      "key": "mcp-server.zip",
+      "contentTypes": ["application/zip"]
+    }
+  }
+}

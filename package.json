@@ -17,7 +17,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "generate": "node dist/cli.js generate",
-    "actor": "apify run --entrypoint start"
+    "actor": "node scripts/sync-actor-test-input.mjs && apify run --entrypoint start",
+    "validate:actor": "apify validate-schema",
+    "sync:actor-input": "node scripts/sync-actor-test-input.mjs"
   },
   "dependencies": {
     "@apidevtools/swagger-parser": "^12.1.0",
