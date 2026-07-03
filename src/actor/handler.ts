@@ -11,6 +11,9 @@ export interface ActorInput {
 /** Maximum OpenAPI spec size accepted by the Actor (10 MB). */
 export const MAX_SPEC_BYTES = 10 * 1024 * 1024;
 
+/** Pay-per-event name — must match the event configured in Apify Console monetization. */
+export const MCP_SERVER_COMPILED_EVENT = "mcp-server-compiled";
+
 export function normalizeActorInput(
   input: Partial<ActorInput> | null | undefined,
 ): { ok: true; input: ActorInput } | { ok: false; errors: GenerationError[] } {
@@ -106,6 +109,19 @@ export async function pushFailureOutput(
   }
 }
 
+async function chargeMcpServerCompiled(): Promise<void> {
+  try {
+    await Actor.charge({
+      eventName: MCP_SERVER_COMPILED_EVENT,
+      count: 1,
+    });
+  } catch (err) {
+    log.error(
+      `Failed to charge for ${MCP_SERVER_COMPILED_EVENT}: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+}
+
 export async function runActor(): Promise<void> {
   try {
     const rawInput = await Actor.getInput<ActorInput>();
@@ -135,6 +151,8 @@ export async function runActor(): Promise<void> {
     await Actor.setValue("mcp-server.zip", result.data.buffer, {
       contentType: "application/zip",
     });
+
+    await chargeMcpServerCompiled();
 
     let downloadUrl: string | undefined;
     try {

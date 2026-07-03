@@ -7,6 +7,7 @@ const mockGetPublicUrl = vi.fn();
 const mockOpenKeyValueStore = vi.fn();
 const mockSetStatusMessage = vi.fn();
 const mockRun = vi.fn();
+const mockCharge = vi.fn();
 const mockLogError = vi.fn();
 
 vi.mock("apify", () => ({
@@ -16,6 +17,7 @@ vi.mock("apify", () => ({
     setValue: (...args: unknown[]) => mockSetValue(...args),
     openKeyValueStore: (...args: unknown[]) => mockOpenKeyValueStore(...args),
     setStatusMessage: (...args: unknown[]) => mockSetStatusMessage(...args),
+    charge: (...args: unknown[]) => mockCharge(...args),
   },
   log: {
     error: (...args: unknown[]) => mockLogError(...args),
@@ -26,7 +28,9 @@ vi.mock("../../src/orchestrator/index.js", () => ({
   createOrchestrator: () => ({ run: mockRun }),
 }));
 
-const { runActor, normalizeActorInput } = await import("../../src/actor/handler.js");
+const { runActor, normalizeActorInput, MCP_SERVER_COMPILED_EVENT } = await import(
+  "../../src/actor/handler.js"
+);
 
 describe("normalizeActorInput", () => {
   it("rejects whitespace-only openApiSpec", () => {
@@ -70,9 +74,11 @@ describe("Actor handler", () => {
     mockOpenKeyValueStore.mockClear();
     mockSetStatusMessage.mockClear();
     mockRun.mockClear();
+    mockCharge.mockClear();
     mockLogError.mockClear();
     mockPushData.mockResolvedValue(undefined);
     mockSetStatusMessage.mockResolvedValue(undefined);
+    mockCharge.mockResolvedValue(undefined);
     mockOpenKeyValueStore.mockResolvedValue({
       getPublicUrl: mockGetPublicUrl,
     });
@@ -95,6 +101,7 @@ describe("Actor handler", () => {
       warnings: [],
     });
     expect(mockSetValue).not.toHaveBeenCalled();
+    expect(mockCharge).not.toHaveBeenCalled();
     expect(mockRun).not.toHaveBeenCalled();
   });
 
@@ -114,6 +121,7 @@ describe("Actor handler", () => {
       warnings: [],
     });
     expect(mockRun).not.toHaveBeenCalled();
+    expect(mockCharge).not.toHaveBeenCalled();
   });
 
   it("rejects whitespace-only openApiSpec without calling orchestrator", async () => {
@@ -127,6 +135,7 @@ describe("Actor handler", () => {
       errors: [{ code: "E001", message: "openApiSpec must not be empty" }],
       warnings: [],
     });
+    expect(mockCharge).not.toHaveBeenCalled();
   });
 
   it("rejects invalid format without calling orchestrator", async () => {
@@ -143,6 +152,7 @@ describe("Actor handler", () => {
       errors: [{ code: "E001", message: 'format must be "json" or "yaml"' }],
       warnings: [],
     });
+    expect(mockCharge).not.toHaveBeenCalled();
   });
 
   it("maps orchestrator failure to error output", async () => {
@@ -166,6 +176,7 @@ describe("Actor handler", () => {
       warnings: [],
     });
     expect(mockSetValue).not.toHaveBeenCalled();
+    expect(mockCharge).not.toHaveBeenCalled();
   });
 
   it("maps orchestrator throw to error output without rethrowing", async () => {
@@ -182,6 +193,7 @@ describe("Actor handler", () => {
       errors: [{ code: "E003", message: "unexpected pipeline failure" }],
       warnings: [],
     });
+    expect(mockCharge).not.toHaveBeenCalled();
   });
 
   it("completes without throwing when pushData fails on failure path", async () => {
@@ -226,6 +238,11 @@ describe("Actor handler", () => {
       expect.any(Buffer),
       { contentType: "application/zip" },
     );
+    expect(mockCharge).toHaveBeenCalledOnce();
+    expect(mockCharge).toHaveBeenCalledWith({
+      eventName: MCP_SERVER_COMPILED_EVENT,
+      count: 1,
+    });
     expect(mockOpenKeyValueStore).toHaveBeenCalledOnce();
     expect(mockGetPublicUrl).toHaveBeenCalledWith("mcp-server.zip");
     expect(mockPushData).toHaveBeenCalledWith({
@@ -263,5 +280,34 @@ describe("Actor handler", () => {
       statistics: { endpointCount: 0 },
       warnings: [],
     });
+    expect(mockCharge).toHaveBeenCalledOnce();
+  });
+
+  it("still completes when billing charge fails after ZIP is written", async () => {
+    mockGetInput.mockResolvedValue({
+      openApiSpec: "openapi: 3.0.3\ninfo:\n  title: Test\n  version: 1.0.0\npaths: {}",
+      format: "yaml",
+    });
+    mockRun.mockResolvedValue({
+      success: true,
+      data: { buffer: Buffer.from("zip"), filename: "test-mcp-server.zip" },
+      errors: [],
+      warnings: [],
+      statistics: { endpointCount: 1 },
+    });
+    mockCharge.mockRejectedValue(new Error("billing unavailable"));
+    mockOpenKeyValueStore.mockRejectedValue(new Error("store unavailable"));
+
+    await expect(runActor()).resolves.toBeUndefined();
+
+    expect(mockSetValue).toHaveBeenCalledOnce();
+    expect(mockCharge).toHaveBeenCalledOnce();
+    expect(mockPushData).toHaveBeenCalledWith({
+      success: true,
+      downloadUrl: undefined,
+      statistics: { endpointCount: 1 },
+      warnings: [],
+    });
+    expect(mockLogError).toHaveBeenCalled();
   });
 });

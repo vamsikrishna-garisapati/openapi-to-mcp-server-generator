@@ -49,9 +49,19 @@ Each generated ZIP includes:
 
 ## How much does it cost to compile an MCP server?
 
-Pricing depends on your Actor's monetization settings in the [Publication tab](https://console.apify.com/actors). On the free Apify plan you can test runs with platform credits before committing to paid usage.
+This Actor uses [pay per event](https://docs.apify.com/platform/actors/publishing/monetize/pay-per-event) pricing:
 
-Each successful run produces **one MCP server ZIP** regardless of endpoint count (within supported limits). Complex specs with many endpoints use more compute time but still yield a single downloadable package.
+| Charge | When |
+| ------ | ---- |
+| **MCP server compiled** | **$0.49** per successful run (one charge = one complete ZIP) |
+| Actor start | ~$0.00005 per run (automatic) |
+| Platform usage | Small compute-unit cost per run (see the **Pricing** tab on this Actor) |
+
+**Failed runs are never charged** for `mcp-server-compiled` — invalid specs, parse errors, and generation failures do not trigger the main event.
+
+Each successful run delivers one full project (tools, auth, Dockerfile, README) regardless of endpoint count within supported limits.
+
+**Trying it out:** Apify's [Free plan](https://apify.com/pricing) includes **$5/month** in platform credits (no credit card required). That is enough for several test compilations. See exact event prices and any Store discounts on this Actor's **Pricing** tab in Console or Apify Store.
 
 ## Input
 
@@ -130,6 +140,10 @@ OpenAPI 3.x with JSON request/response bodies, API Key auth, and Bearer Token au
 ### Can I run this Actor via API?
 
 Yes. Use the [Apify REST API](https://docs.apify.com/api/v2#tag/ActorsRun-collection/operation/act_runs_post) or `apify-client` to trigger runs from CI/CD when your API spec changes.
+
+### How does billing work?
+
+You pay the **mcp-server-compiled** event only when a ZIP is successfully generated. You can set a [maximum charge per run](https://docs.apify.com/platform/actors/running/actors-in-store#pay-per-event) in Console before starting. Event prices and platform usage are listed on this Actor's **Pricing** tab.
 
 ### Something failed — where do I look?
 
