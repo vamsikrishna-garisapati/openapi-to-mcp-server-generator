@@ -59,9 +59,11 @@ See the **Input** tab in Apify Console for the full schema and field tooltips.
 
 | Field | Required | Description |
 | ----- | -------- | ----------- |
-| `openApiSpec` | Yes | Full OpenAPI document as a JSON or YAML string |
-| `format` | Yes | `"json"` or `"yaml"` — must match the spec you pasted |
+| `openApiSpec` | Yes* | Full OpenAPI document as a JSON or YAML string |
+| `format` | Yes* | `"json"` or `"yaml"` — must match the spec you pasted |
 | `projectName` | No | Override name for the generated project folder |
+
+\* **API default behavior:** If you omit fields when starting via API, CLI, or scheduler, the platform injects the Petstore sample spec from the input schema `default` values. Always pass your own `openApiSpec` and `format` in production API calls. The Console UI uses `prefill` as an editable example only.
 
 **Tips:**
 
@@ -155,4 +157,19 @@ Local CLI (without Apify):
 ```bash
 pnpm install && pnpm run build
 pnpm run generate -- --input path/to/spec.yaml --output ./out.zip
+```
+
+Apify Actor (local):
+
+```bash
+pnpm install && pnpm run build
+pnpm actor                    # syncs test input, then apify run
+pnpm validate:actor           # validate all .actor schemas
+pnpm sync:actor-input         # refresh prefill/default from petstore fixture
+```
+
+Before deploying:
+
+```bash
+pnpm sync:actor-input && pnpm test && pnpm validate:actor && apify push
 ```

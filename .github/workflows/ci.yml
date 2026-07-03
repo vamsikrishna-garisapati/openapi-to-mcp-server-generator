@@ -22,6 +22,8 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+      - run: pnpm sync:actor-input
+      - run: pnpm validate:actor
       - run: pnpm run build
       - run: pnpm test
 

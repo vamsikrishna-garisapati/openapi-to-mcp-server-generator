@@ -151,6 +151,16 @@ export async function runActor(): Promise<void> {
       statistics: result.statistics ?? {},
       warnings: result.warnings,
     });
+
+    const endpointCount = result.statistics?.endpointCount ?? 0;
+    try {
+      await Actor.setStatusMessage(
+        `Generated MCP server (${endpointCount} tools)`,
+        { isStatusMessageTerminal: true },
+      );
+    } catch {
+      // Status message is best-effort; do not crash the Actor.
+    }
   } catch (err) {
     await pushFailureOutput([
       {

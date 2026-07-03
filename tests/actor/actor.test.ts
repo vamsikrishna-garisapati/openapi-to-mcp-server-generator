@@ -235,6 +235,10 @@ describe("Actor handler", () => {
       statistics: { endpointCount: 5, durationMs: 120 },
       warnings: [{ code: "P004", message: "Example warning" }],
     });
+    expect(mockSetStatusMessage).toHaveBeenCalledWith(
+      "Generated MCP server (5 tools)",
+      { isStatusMessageTerminal: true },
+    );
   });
 
   it("omits downloadUrl when key-value store URL is unavailable", async () => {
