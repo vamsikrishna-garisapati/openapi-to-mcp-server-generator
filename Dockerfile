@@ -6,6 +6,8 @@ ENV NODE_ENV=development
 
 RUN corepack enable pnpm
 
+RUN rm -rf node_modules
+
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
@@ -19,6 +21,8 @@ RUN pnpm run build
 FROM apify/actor-node:20
 
 RUN corepack enable pnpm
+
+RUN rm -rf node_modules
 
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod
