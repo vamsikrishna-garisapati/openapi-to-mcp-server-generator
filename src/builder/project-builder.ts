@@ -24,7 +24,7 @@ export function createProjectBuilder(
       logger.info("Building project directory...");
 
       try {
-        const rootPath = await mkdtemp(join(tmpdir(), "mcp-studio-"));
+        const rootPath = await mkdtemp(join(tmpdir(), "openapi-mcp-gen-"));
 
         for (const file of files.files) {
           const fullPath = join(rootPath, file.path);

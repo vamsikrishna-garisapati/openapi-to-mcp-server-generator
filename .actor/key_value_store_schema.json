@@ -1,7 +1,7 @@
 {
   "actorKeyValueStoreSchemaVersion": 1,
   "title": "Generated MCP server artifacts",
-  "description": "Downloadable ZIP archives produced by the OpenAPI to MCP Server Generator.",
+  "description": "Downloadable ZIP archives produced by the OpenAPI MCP Server Compiler.",
   "collections": {
     "mcpServerZip": {
       "title": "MCP server ZIP",

@@ -2,7 +2,7 @@
 
 # Project Name
 
-**MCP Studio** (working title)
+**OpenAPI MCP Server Compiler**
 
 ---
 
@@ -14,9 +14,9 @@ v1.0 (MVP)
 
 # 1. Executive Summary
 
-MCP Studio is a developer tool that converts OpenAPI specifications into production-ready Model Context Protocol (MCP) servers.
+OpenAPI MCP Server Compiler is a developer tool that converts OpenAPI specifications into production-ready Model Context Protocol (MCP) servers.
 
-Instead of manually implementing MCP tools, authentication, validation, and deployment files, users upload an OpenAPI specification (JSON or YAML), and MCP Studio generates a complete, deployable MCP server.
+Instead of manually implementing MCP tools, authentication, validation, and deployment files, users upload an OpenAPI specification (JSON or YAML), and OpenAPI MCP Server Compiler generates a complete, deployable MCP server.
 
 The primary objective is to reduce the time required to build an MCP server from several days to a few minutes.
 
@@ -132,7 +132,7 @@ Developers creating connectors between APIs and AI systems.
 
 Developers who want to expose Actors through MCP.
 
-> **Version 1 note:** MCP Studio itself runs as an Apify Actor (the generator is hosted on Apify). The future feature "Apify Actor wrapper mode" (PRD §14) is different — it would generate MCP servers that wrap existing Apify Actors as tools.
+> **Version 1 note:** OpenAPI MCP Server Compiler itself runs as an Apify Actor (the generator is hosted on Apify). The future feature "Apify Actor wrapper mode" (PRD §14) is different — it would generate MCP servers that wrap existing Apify Actors as tools.
 
 ---
 

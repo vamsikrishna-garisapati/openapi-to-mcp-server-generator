@@ -1,6 +1,6 @@
 {
   "actorOutputSchemaVersion": 1,
-  "title": "OpenAPI to MCP Server Generator output",
+  "title": "OpenAPI MCP Server Compiler output",
   "description": "Generation summary in the dataset and the downloadable MCP server ZIP in the key-value store.",
   "properties": {
     "summary": {

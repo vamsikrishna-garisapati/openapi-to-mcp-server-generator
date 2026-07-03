@@ -5,8 +5,8 @@ import { createOrchestrator } from "./orchestrator/index.js";
 const program = new Command();
 
 program
-  .name("mcp-studio")
-  .description("Generate MCP server projects from OpenAPI specifications")
+  .name("openapi-mcp-gen")
+  .description("Compile MCP server projects from OpenAPI specifications (OpenAPI MCP Server Compiler)")
   .version("1.0.0");
 
 program

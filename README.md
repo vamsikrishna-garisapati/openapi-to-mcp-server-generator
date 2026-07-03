@@ -1,6 +1,6 @@
 Turn any **OpenAPI 3.x** specification into a **production-ready MCP server** you can connect to Cursor, Claude Desktop, or any MCP-compatible AI assistant. Paste your spec, run the Actor, and download a complete deployable ZIP — no manual tool definitions, auth wiring, or boilerplate.
 
-## What can this OpenAPI to MCP Server Generator do?
+## What can this OpenAPI MCP Server Compiler do?
 
 - **Generate a full MCP server project** from OpenAPI JSON or YAML — one MCP tool per REST endpoint
 - **Include auth setup** — API Key and Bearer Token via environment variables
@@ -27,7 +27,7 @@ Each generated ZIP includes:
 
 **Supported today:** OpenAPI 3.x, JSON request/response bodies, REST APIs.
 
-## How to generate an MCP server from OpenAPI
+## How to compile an MCP server from OpenAPI
 
 1. Open this Actor in [Apify Console](https://console.apify.com) and click **Start**.
 2. Paste your full OpenAPI document into **OpenAPI Specification**.
@@ -47,7 +47,7 @@ Each generated ZIP includes:
 }
 ```
 
-## How much does it cost to generate an MCP server?
+## How much does it cost to compile an MCP server?
 
 Pricing depends on your Actor's monetization settings in the [Publication tab](https://console.apify.com/actors). On the free Apify plan you can test runs with platform credits before committing to paid usage.
 
@@ -157,6 +157,7 @@ Local CLI (without Apify):
 ```bash
 pnpm install && pnpm run build
 pnpm run generate -- --input path/to/spec.yaml --output ./out.zip
+# or: pnpm exec openapi-mcp-gen generate --input path/to/spec.yaml --output ./out.zip
 ```
 
 Apify Actor (local):

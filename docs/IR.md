@@ -1,6 +1,6 @@
 # Internal Representation (IR) Specification (Revised)
 
-**Project:** MCP Studio
+**Project:** OpenAPI MCP Server Compiler
 
 **Version:** 2.0 (Architecture Freeze)
 
@@ -10,7 +10,7 @@
 
 # 1. Purpose
 
-The Internal Representation (IR) is the canonical data model used throughout MCP Studio.
+The Internal Representation (IR) is the canonical data model used throughout OpenAPI MCP Server Compiler.
 
 After parsing completes, **no module is allowed to access the original OpenAPI document**.
 

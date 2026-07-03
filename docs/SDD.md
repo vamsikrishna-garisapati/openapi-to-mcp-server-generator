@@ -2,7 +2,7 @@
 
 # Project
 
-MCP Studio
+OpenAPI MCP Server Compiler
 
 Version 2.0 (Architecture Freeze)
 
@@ -10,7 +10,7 @@ Version 2.0 (Architecture Freeze)
 
 # 1. Overview
 
-MCP Studio is designed as a **compiler pipeline**, not a CRUD application.
+OpenAPI MCP Server Compiler is designed as a **compiler pipeline**, not a CRUD application.
 
 The system transforms an OpenAPI specification into a production-ready MCP server through a series of deterministic stages.
 
@@ -566,7 +566,7 @@ Generated code validates required credentials before making API requests.
 
 # 21. Deployment Architecture
 
-Version 1 runs as an **Apify Actor** that hosts the MCP Studio generator itself.
+Version 1 runs as an **Apify Actor** that hosts the OpenAPI MCP Server Compiler itself.
 
 > **Note:** This is distinct from the PRD future feature "Apify Actor wrapper mode", which would generate MCP servers that wrap existing Apify Actors. Version 1 uses Apify only as the runtime for the generator.
 

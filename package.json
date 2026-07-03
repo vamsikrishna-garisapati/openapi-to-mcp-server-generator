@@ -1,11 +1,11 @@
 {
-  "name": "mcp-studio",
+  "name": "openapi-to-mcp-server-generator",
   "version": "1.0.0",
-  "description": "OpenAPI to MCP server compiler pipeline",
+  "description": "OpenAPI MCP server compiler pipeline",
   "type": "module",
   "main": "dist/cli.js",
   "bin": {
-    "mcp-studio": "./dist/cli.js"
+    "openapi-mcp-gen": "./dist/cli.js"
   },
   "packageManager": "pnpm@9.15.9",
   "engines": {

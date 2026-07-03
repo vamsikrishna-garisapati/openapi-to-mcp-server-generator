@@ -1,4 +1,4 @@
-# MCP Studio — Documentation Index
+# OpenAPI MCP Server Compiler — Documentation Index
 
 **Architecture freeze:** v2.0
 
