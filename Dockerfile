@@ -1,6 +1,9 @@
 # Builder: compile TypeScript and copy templates (needs devDependencies)
 FROM apify/actor-node:20 AS builder
 
+# Base image sets NODE_ENV=production; override so devDependencies install for tsc.
+ENV NODE_ENV=development
+
 RUN corepack enable pnpm
 
 COPY package.json pnpm-lock.yaml ./
