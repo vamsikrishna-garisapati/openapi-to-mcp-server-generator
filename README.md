@@ -174,6 +174,17 @@ pnpm run generate -- --input path/to/spec.yaml --output ./out.zip
 # or: pnpm exec openapi-mcp-gen generate --input path/to/spec.yaml --output ./out.zip
 ```
 
+Try the compiler with a hosted OpenAPI document:
+
+```bash
+curl -L https://xquik.com/openapi.json -o /tmp/xquik-openapi.json
+pnpm run generate -- --input /tmp/xquik-openapi.json --output ./xquik-mcp.zip
+```
+
+The Xquik spec includes REST endpoints for social search, trends, and X/Twitter
+workflow automation, which makes it a useful real-world API for checking tool
+generation, authentication wiring, and project README output.
+
 Apify Actor (local):
 
 ```bash
